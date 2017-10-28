@@ -27,7 +27,8 @@ enum planck_layers {
   _RAISE,
   _PLOVER,
   _ADJUST,
-  _FUNCTION
+  _FUNCTION,
+  _NPAD
 };
 
 enum planck_keycodes {
@@ -39,7 +40,8 @@ enum planck_keycodes {
   RAISE,
   BACKLIT,
   EXT_PLV,
-  FUNCTION
+  FUNCTION,
+  NPAD
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -52,14 +54,14 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------|------+------+------+------+------+------|
  * | Shift|   Z  |   X  |   C  |   V  |   B  |   N  |   M  |   ,  |   .  |   /  |Enter |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * | Func | GUI  | Alt  | Esc  |Lower |    Space    |Raise | Left |   [  |   ]  | Esc  |
+ * | Func | Raise| Win  | Alt  |Lower |    Space    |Raise | NPAD |   [  |   ]  | Esc  |
  * `-----------------------------------------------------------------------------------'
  */
 [_QWERTY] = {
-  {KC_TAB   , KC_Q    , KC_W    , KC_E   , KC_R  , KC_T   , KC_Y   , KC_U  , KC_I    , KC_O    , KC_P    , KC_BSPC} ,
-  {KC_LCTL  , KC_A    , KC_S    , KC_D   , KC_F  , KC_G   , KC_H   , KC_J  , KC_K    , KC_L    , KC_SCLN , KC_QUOT} ,
-  {KC_LSFT  , KC_Z    , KC_X    , KC_C   , KC_V  , KC_B   , KC_N   , KC_M  , KC_COMM , KC_DOT  , KC_SLSH , KC_ENT } ,
-  {FUNCTION , KC_LGUI , KC_LALT , KC_ESC , LOWER , KC_SPC , KC_SPC , RAISE , KC_RGUI , KC_LBRC , KC_RBRC , KC_ESC}
+  {KC_TAB   , KC_Q   , KC_W    , KC_E    , KC_R  , KC_T   , KC_Y   , KC_U  , KC_I    , KC_O    , KC_P    , KC_BSPC} ,
+  {KC_LCTL  , KC_A   , KC_S    , KC_D    , KC_F  , KC_G   , KC_H   , KC_J  , KC_K    , KC_L    , KC_SCLN , KC_QUOT} ,
+  {KC_LSFT  , KC_Z   , KC_X    , KC_C    , KC_V  , KC_B   , KC_N   , KC_M  , KC_COMM , KC_DOT  , KC_SLSH , KC_ENT } ,
+  {FUNCTION , RAISE  , KC_LGUI , KC_LALT , LOWER , KC_SPC , KC_SPC , RAISE , NPAD    , KC_LBRC , KC_RBRC , KC_ESC}
 }           ,
 
 /* Colemak
@@ -187,6 +189,24 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   {_______, _______, KC_VOLD, KC_MUTE, KC_VOLU, _______, KC_LEFT, KC_DOWN, KC_UP  , KC_RGHT, KC_END , KC_ENT},
   {_______, _______, _______, _______, _______, _______, _______, _______, KC_END , _______, _______, _______},
   {_______, _______, _______, _______, KC_ESC , _______, _______, KC_ESC , KC_HOME, KC_PGUP, KC_PGDN, KC_END}
+},
+
+/* Number Pad
+ * ,-----------------------------------------------------------------------------------.
+ * |      |      |      |      |      |      |      |      |  7   |  8   |  9   |  +   |
+ * |------+------+------+------+------+-------------+------+------+------+------+------|
+ * |      |      |      |      |      |      |      |      |  4   |  5   |  6   |  -   |
+ * |------+------+------+------+------+------|------+------+------+------+------+------|
+ * |      |      |      |      |      |      |      |      |  1   |  2   |  3   |  *   |
+ * |------+------+------+------+------+------+------+------+------+------+------+------|
+ * |      |      |      |      |      |             |      |      |  0   |  .   |  /   |
+ * `-----------------------------------------------------------------------------------'
+ */
+[_NPAD] = {
+  {_______ , _______ , _______ , _______ , _______ , _______ , _______ , _______ , KC_7    , KC_8 , KC_9   , KC_PLUS} ,
+  {_______ , _______ , _______ , _______ , _______ , _______ , _______ , _______ , KC_4    , KC_5 , KC_6   , KC_MINS} ,
+  {_______ , _______ , _______ , _______ , _______ , _______ , _______ , _______ , KC_1    , KC_2 , KC_3   , KC_ASTR} ,
+  {_______ , _______ , _______ , _______ , _______ , _______ , _______ , _______ , _______ , KC_0 , KC_DOT , KC_SLSH}
 }
 
 };
@@ -280,6 +300,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         layer_on(_FUNCTION);
       } else {
         layer_off(_FUNCTION);
+      }
+      return false;
+      break;
+    case NPAD:
+      if (record->event.pressed) {
+        layer_on(_NPAD);
+      } else {
+        layer_off(_NPAD);
       }
       return false;
       break;

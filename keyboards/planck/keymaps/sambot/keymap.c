@@ -14,10 +14,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef BACKLIGHT_ENABLE
+#include "backlight.h"
+#endif
 #include "planck.h"
 #include "action_layer.h"
 
 extern keymap_config_t keymap_config;
+
+enum macro_id {
+  M_LED = 0,
+};
+
+#define ROT_LED M(M_LED)   /* Rotate LED */
 
 enum planck_layers {
   _QWERTY,
@@ -61,7 +70,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   {KC_TAB   , KC_Q   , KC_W    , KC_E    , KC_R  , KC_T   , KC_Y   , KC_U  , KC_I    , KC_O    , KC_P    , KC_BSPC} ,
   {KC_LCTL  , KC_A   , KC_S    , KC_D    , KC_F  , KC_G   , KC_H   , KC_J  , KC_K    , KC_L    , KC_SCLN , KC_QUOT} ,
   {KC_LSFT  , KC_Z   , KC_X    , KC_C    , KC_V  , KC_B   , KC_N   , KC_M  , KC_COMM , KC_DOT  , KC_SLSH , KC_ENT } ,
-  {FUNCTION , RAISE  , KC_LGUI , KC_LALT , LOWER , KC_SPC , KC_SPC , RAISE , NPAD    , KC_LBRC , KC_RBRC , KC_ESC}
+  {FUNCTION , RAISE  , KC_LGUI , KC_LALT , LOWER , KC_SPC , KC_SPC , RAISE , NPAD    , ROT_LED , KC_RBRC , KC_ESC}
 }           ,
 
 /* Colemak
@@ -215,6 +224,24 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   float plover_song[][2]     = SONG(PLOVER_SOUND);
   float plover_gb_song[][2]  = SONG(PLOVER_GOODBYE_SOUND);
 #endif
+
+const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
+{
+  switch(id) {
+  case M_LED:
+    if (record->event.pressed) {
+      register_code(KC_RSFT);
+#ifdef BACKLIGHT_ENABLE
+      backlight_step();
+#endif
+    } else {
+      unregister_code(KC_RSFT);
+    }
+    break;	    
+  }
+  return MACRO_NONE;
+};
+
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {

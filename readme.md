@@ -17,7 +17,8 @@ The docs are hosted on [Gitbook](https://www.gitbook.com/book/qmk/firmware/detai
 
 ## Supported Keyboards
 
-* [Planck](/keyboards/planck/)
+* [Planck](/keyboards/planck/) - e.g. `make planck/rev4:sambot` and use qmk
+  configurator to flash
 * [Preonic](/keyboards/preonic/)
 * [ErgoDox EZ](/keyboards/ergodox_ez/)
 * [Clueboard](/keyboards/clueboard/)

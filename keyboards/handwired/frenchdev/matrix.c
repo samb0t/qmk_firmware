@@ -35,9 +35,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "util.h"
 #include "matrix.h"
 #include "frenchdev.h"
-#ifdef DEBUG_MATRIX_SCAN_RATE
-#include  "timer.h"
-#endif
 
 /*
  * This constant define not debouncing time in msecs, but amount of matrix
@@ -65,12 +62,6 @@ static void unselect_rows(void);
 static void select_row(uint8_t row);
 
 static uint8_t mcp23018_reset_loop;
-
-#ifdef DEBUG_MATRIX_SCAN_RATE
-uint32_t matrix_timer;
-uint32_t matrix_scan_count;
-#endif
-
 
 __attribute__ ((weak))
 void matrix_init_user(void) {}
@@ -120,13 +111,7 @@ void matrix_init(void)
         matrix_debouncing[i] = 0;
     }
 
-#ifdef DEBUG_MATRIX_SCAN_RATE
-    matrix_timer = timer_read32();
-    matrix_scan_count = 0;
-#endif
-
-    matrix_init_quantum();
-
+    matrix_init_kb();
 }
 
 void matrix_power_up(void) {
@@ -140,12 +125,6 @@ void matrix_power_up(void) {
         matrix[i] = 0;
         matrix_debouncing[i] = 0;
     }
-
-#ifdef DEBUG_MATRIX_SCAN_RATE
-    matrix_timer = timer_read32();
-    matrix_scan_count = 0;
-#endif
-
 }
 
 uint8_t matrix_scan(void)
@@ -165,20 +144,6 @@ uint8_t matrix_scan(void)
         }
     }
 
-#ifdef DEBUG_MATRIX_SCAN_RATE
-    matrix_scan_count++;
-
-    uint32_t timer_now = timer_read32();
-    if (TIMER_DIFF_32(timer_now, matrix_timer)>1000) {
-        print("matrix scan frequency: ");
-        pdec(matrix_scan_count);
-        print("\n");
-
-        matrix_timer = timer_now;
-        matrix_scan_count = 0;
-    }
-#endif
-
     for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
         select_row(i);
         wait_us(30);  // without this wait read unstable value.
@@ -186,7 +151,7 @@ uint8_t matrix_scan(void)
         if (matrix_debouncing[i] != cols) {
             matrix_debouncing[i] = cols;
             if (debouncing) {
-                debug("bounce!: "); debug_hex(debouncing); debug("\n");
+                dprintf("bounce!: %02X\n", debouncing);
             }
             debouncing = DEBOUNCE;
         }
@@ -204,15 +169,9 @@ uint8_t matrix_scan(void)
         }
     }
 
-    matrix_scan_quantum();
+    matrix_scan_kb();
 
     return 1;
-}
-
-bool matrix_is_modified(void)
-{
-    if (debouncing) return false;
-    return true;
 }
 
 inline
@@ -231,19 +190,10 @@ void matrix_print(void)
 {
     print("\nr/c 0123456789ABCDEF\n");
     for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
-        phex(row); print(": ");
-        pbin_reverse16(matrix_get_row(row));
+        print_hex8(row); print(": ");
+        print_bin_reverse16(matrix_get_row(row));
         print("\n");
     }
-}
-
-uint8_t matrix_key_count(void)
-{
-    uint8_t count = 0;
-    for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-        count += bitpop16(matrix[i]);
-    }
-    return count;
 }
 
 /* Column pin configuration
@@ -274,15 +224,9 @@ static matrix_row_t read_cols(uint8_t row)
             return 0;
         } else {
             uint8_t data = 0;
-            mcp23018_status = i2c_start(I2C_ADDR_WRITE, I2C_TIMEOUT);   if (mcp23018_status) goto out;
-            mcp23018_status = i2c_write(GPIOB, I2C_TIMEOUT);            if (mcp23018_status) goto out;
-            mcp23018_status = i2c_start(I2C_ADDR_READ, I2C_TIMEOUT);    if (mcp23018_status) goto out;
-            data = i2c_read_nack(I2C_TIMEOUT);                         if (mcp23018_status < 0) goto out;
-            data = ~((uint8_t)mcp23018_status);
-            mcp23018_status = I2C_STATUS_SUCCESS;
-        out:
-            i2c_stop();
-            return data;
+            mcp23018_status = i2c_readReg(I2C_ADDR, GPIOB, &data, 1, I2C_TIMEOUT);
+
+            return ~data;
         }
     } else {
         // read from teensy
@@ -313,11 +257,10 @@ static void unselect_rows(void)
         // do nothing
     } else {
         // set all rows hi-Z : 1
-        mcp23018_status = i2c_start(I2C_ADDR_WRITE, I2C_TIMEOUT);    if (mcp23018_status) goto out;
-        mcp23018_status = i2c_write(GPIOA, I2C_TIMEOUT);             if (mcp23018_status) goto out;
-        mcp23018_status = i2c_write( 0xFF & ~(0<<8), I2C_TIMEOUT);   if (mcp23018_status) goto out;
-    out:
-        i2c_stop();
+        uint8_t data;
+        data = 0xFF & ~(0<<8);
+        mcp23018_status = i2c_writeReg(I2C_ADDR, GPIOA, &data, 1, I2C_TIMEOUT);
+
     }
 
     // unselect on teensy
@@ -339,11 +282,8 @@ static void select_row(uint8_t row)
         } else {
             // set active row low  : 0
             // set other rows hi-Z : 1
-            mcp23018_status = i2c_start(I2C_ADDR_WRITE, I2C_TIMEOUT);                          if (mcp23018_status) goto out;
-            mcp23018_status = i2c_write(GPIOA, I2C_TIMEOUT);                                   if (mcp23018_status) goto out;
-            mcp23018_status = i2c_write( 0xFF & ~(1<<row) & ~(0<<8), I2C_TIMEOUT);             if (mcp23018_status) goto out;
-        out:
-            i2c_stop();
+            uint8_t data = 0xFF & ~(1<<row) & ~(0<<8);
+            mcp23018_status = i2c_writeReg(I2C_ADDR, GPIOA, &data, 1, I2C_TIMEOUT);
         }
     } else {
         // select on teensy

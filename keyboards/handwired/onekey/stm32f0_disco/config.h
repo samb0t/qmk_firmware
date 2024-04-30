@@ -16,8 +16,7 @@
 
 #pragma once
 
-#include "config_common.h"
+#define BACKLIGHT_PWM_DRIVER  PWMD3
+#define BACKLIGHT_PAL_MODE    0
 
-#define MATRIX_COL_PINS { B4 }
-#define MATRIX_ROW_PINS { B5 }
-#define UNUSED_PINS
+#define ADC_PIN A0

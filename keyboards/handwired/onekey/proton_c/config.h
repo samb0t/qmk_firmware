@@ -16,8 +16,4 @@
 
 #pragma once
 
-#include "config_common.h"
-
-#define MATRIX_COL_PINS { A3 }
-#define MATRIX_ROW_PINS { A2 }
-#define UNUSED_PINS
+#define ADC_PIN A0

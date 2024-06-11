@@ -19,3 +19,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define ADNS9800_CS_PIN F7
 #define POINTING_DEVICE_INVERT_X
+#define POINTING_DEVICE_DEBUG

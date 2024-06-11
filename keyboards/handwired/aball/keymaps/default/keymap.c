@@ -17,3 +17,8 @@
 
 // Dummy
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {{{ KC_NO }}};
+
+void pointing_device_init_kb(void) {
+    pointing_device_set_cpi(5000);
+    pointing_device_init_user();
+}

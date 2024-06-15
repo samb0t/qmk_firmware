@@ -30,8 +30,16 @@ float scroll_accumulated_v = 0;
 
 // Function to handle mouse reports and perform drag scrolling
 report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
+    //hack to throw away mysterious -180 values that cause jumpy cursor
+    if (mouse_report.x < -179 || mouse_report.x > 179) {
+        mouse_report.x = 0;
+    }
+    if (mouse_report.y < -179 || mouse_report.y > 179) {
+        mouse_report.y = 0;
+    }
+    //https://docs.qmk.fm/features/pointing_device
     // Check if drag scrolling is active
-    if (set_scrolling && host_keyboard_led_state().caps_lock) {
+    if (set_scrolling && host_keyboard_led_state().num_lock) {
         // Calculate and accumulate scroll values based on mouse movement and divisors
         scroll_accumulated_h += (float)mouse_report.x / SCROLL_DIVISOR_H;
         scroll_accumulated_v += (float)mouse_report.y / SCROLL_DIVISOR_V;
@@ -46,12 +54,6 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
 
         // Clear the X and Y values of the mouse report
         mouse_report.x = 0;
-        mouse_report.y = 0;
-    }
-    if (mouse_report.x < -10 || mouse_report.x > 10) {
-        mouse_report.x = 0;
-    }
-    if (mouse_report.y < -10 || mouse_report.y > 10) {
         mouse_report.y = 0;
     }
     return mouse_report;

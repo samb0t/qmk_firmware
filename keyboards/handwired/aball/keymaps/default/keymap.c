@@ -31,10 +31,10 @@ float scroll_accumulated_v = 0;
 // Function to handle mouse reports and perform drag scrolling
 report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
     //hack to throw away mysterious -180 values that cause jumpy cursor
-    if (mouse_report.x < -127 || mouse_report.x > 127) {
+    if (mouse_report.x < -100 || mouse_report.x > 100) {
         mouse_report.x = 0;
     }
-    if (mouse_report.y < -127 || mouse_report.y > 127) {
+    if (mouse_report.y < -100 || mouse_report.y > 100) {
         mouse_report.y = 0;
     }
     //https://docs.qmk.fm/features/pointing_device

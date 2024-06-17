@@ -19,7 +19,7 @@ enum custom_keycodes {
     DRAG_SCROLL = SAFE_RANGE,
 };
 
-bool set_scrolling = true;//start with false
+bool set_scrolling = false;
 
 // Modify these values to adjust the scrolling speed
 #define SCROLL_DIVISOR_H 8.0
@@ -39,7 +39,7 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
     }
     //https://docs.qmk.fm/features/pointing_device
     // Check if drag scrolling is active
-    if (set_scrolling && host_keyboard_led_state().num_lock) {
+    if (set_scrolling) {
         // Calculate and accumulate scroll values based on mouse movement and divisors
         scroll_accumulated_h += (float)mouse_report.x / SCROLL_DIVISOR_H;
         scroll_accumulated_v += (float)mouse_report.y / SCROLL_DIVISOR_V;
@@ -70,8 +70,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         default:
             break;
     }
-
-    set_scrolling = true; //remove this and replace with numlock
     return true;
 }
 
@@ -82,7 +80,11 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 }
 
 // Dummy
-const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {{{ KC_NO }}};
+const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
+  [0] = LAYOUT (
+    DRAG_SCROLL
+  )
+};
 
 void pointing_device_init_kb(void) {
     pointing_device_set_cpi(5000);

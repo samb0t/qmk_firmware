@@ -12,7 +12,7 @@
     "bootloader": "atmel-dfu",
     "matrix_pins": {
         "direct": [
-            [null]
+            ["F5"]
         ]
     },
     "layouts": {

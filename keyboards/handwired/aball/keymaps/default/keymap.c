@@ -22,8 +22,8 @@ enum custom_keycodes {
 bool set_scrolling = false;
 
 // Modify these values to adjust the scrolling speed
-#define SCROLL_DIVISOR_H 8.0
-#define SCROLL_DIVISOR_V 8.0
+#define SCROLL_DIVISOR_H 6.0
+#define SCROLL_DIVISOR_V 6.0
 
 float scroll_accumulated_h = 0;
 float scroll_accumulated_v = 0;
@@ -39,7 +39,7 @@ report_mouse_t pointing_device_task_user(report_mouse_t mouse_report) {
     }
     //https://docs.qmk.fm/features/pointing_device
     // Check if drag scrolling is active
-    if (set_scrolling) {
+    if (set_scrolling || host_keyboard_led_state().num_lock) {
         // Calculate and accumulate scroll values based on mouse movement and divisors
         scroll_accumulated_h += (float)mouse_report.x / SCROLL_DIVISOR_H;
         scroll_accumulated_v += (float)mouse_report.y / SCROLL_DIVISOR_V;

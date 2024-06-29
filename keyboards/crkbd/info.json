@@ -16,7 +16,7 @@
         "extrakey": true,
         "mousekey": true,
         "nkro": true,
-        "oled": true
+        "oled": false
     },
     "build": {
         "lto": true

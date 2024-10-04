@@ -102,7 +102,7 @@ void x_reset(tap_dance_state_t *state, void *user_data) {
         //case TD_DOUBLE_TAP: unregister_code(KC_ESC); break;
         case TD_DOUBLE_HOLD: set_scrolling = false; break;
         //case TD_DOUBLE_SINGLE_TAP: unregister_code(KC_X); break;
-        case TD_TRIPLE_TAP: register_code(KC_BTN2); break;
+        case TD_TRIPLE_TAP: unregister_code(KC_BTN2); break;
         default: break;
     }
     xtap_state.state = TD_NONE;

@@ -84,7 +84,7 @@ void x_finished(tap_dance_state_t *state, void *user_data) {
     switch (xtap_state.state) {
         case TD_SINGLE_TAP: register_code(KC_BTN1); break;
         case TD_SINGLE_HOLD: register_code(KC_BTN1); break;
-        //case TD_DOUBLE_TAP: register_code(KC_ESC); break;
+        case TD_DOUBLE_TAP: tap_code(KC_BTN1); register_code(KC_BTN1); break;
         case TD_DOUBLE_HOLD: set_scrolling = true; break;
         // Last case is for fast typing. Assuming your key is `f`:
         // For example, when typing the word `buffer`, and you want to make sure that you send `ff` and not `Esc`.
@@ -99,7 +99,7 @@ void x_reset(tap_dance_state_t *state, void *user_data) {
     switch (xtap_state.state) {
         case TD_SINGLE_TAP: unregister_code(KC_BTN1); break;
         case TD_SINGLE_HOLD: unregister_code(KC_BTN1); break;
-        //case TD_DOUBLE_TAP: unregister_code(KC_ESC); break;
+        case TD_DOUBLE_TAP: unregister_code(KC_BTN1); break;
         case TD_DOUBLE_HOLD: set_scrolling = false; break;
         //case TD_DOUBLE_SINGLE_TAP: unregister_code(KC_X); break;
         case TD_TRIPLE_TAP: unregister_code(KC_BTN2); break;

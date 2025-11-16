@@ -65,8 +65,8 @@ uint16_t          dpi_array[] = PLOOPY_DPI_OPTIONS;
 // Trackball State
 bool  is_scroll_clicked    = false;
 bool  is_drag_scroll       = false;
-float scroll_accumulated_h = 0;
-float scroll_accumulated_v = 0;
+//float scroll_accumulated_h = 0;
+//float scroll_accumulated_v = 0;
 
 #ifdef ENCODER_ENABLE
 uint16_t lastScroll        = 0; // Previous confirmed wheel event
@@ -138,6 +138,7 @@ void cycle_dpi(void) {
     pointing_device_set_cpi(dpi_array[keyboard_config.dpi_config]);
 }
 
+/*
 report_mouse_t pointing_device_task_kb(report_mouse_t mouse_report) {
     mouse_report = pointing_device_task_user(mouse_report);
     if (is_drag_scroll) {
@@ -166,6 +167,7 @@ report_mouse_t pointing_device_task_kb(report_mouse_t mouse_report) {
 
     return mouse_report;
 }
+*/
 
 bool process_record_kb(uint16_t keycode, keyrecord_t* record) {
     if (debug_mouse) {

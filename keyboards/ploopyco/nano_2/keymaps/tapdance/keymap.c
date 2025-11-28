@@ -39,7 +39,8 @@ typedef enum {
     TD_DOUBLE_HOLD,
     TD_DOUBLE_SINGLE_TAP, // Send two single taps
     TD_TRIPLE_TAP,
-    TD_TRIPLE_HOLD
+    TD_TRIPLE_HOLD,
+    TD_QUAD_TAP
 } td_state_t;
 
 typedef struct {
@@ -73,6 +74,9 @@ td_state_t cur_dance(tap_dance_state_t *state) {
     if (state->count == 3) {
         if (state->interrupted || !state->pressed) return TD_TRIPLE_TAP;
         else return TD_TRIPLE_HOLD;
+    } else if (state->count == 4) {
+        if (state->interrupted || !state->pressed) return TD_QUAD_TAP;
+        else return TD_UNKNOWN;
     } else return TD_UNKNOWN;
 }
 
@@ -94,6 +98,7 @@ void x_finished(tap_dance_state_t *state, void *user_data) {
         // In order to type `ff` when typing fast, the next character will have to be hit within the `TAPPING_TERM`, which by default is 200ms.
         //case TD_DOUBLE_SINGLE_TAP: tap_code(KC_X); register_code(KC_X); break;
         case TD_TRIPLE_TAP: register_code(MS_BTN2); break;
+        case TD_QUAD_TAP: set_scrolling = !set_scrolling; break;
         default: break;
     }
 }
@@ -106,6 +111,7 @@ void x_reset(tap_dance_state_t *state, void *user_data) {
         case TD_DOUBLE_HOLD: set_scrolling = false; break;
         //case TD_DOUBLE_SINGLE_TAP: unregister_code(KC_X); break;
         case TD_TRIPLE_TAP: unregister_code(MS_BTN2); break;
+        //case TD_QUAD_TAP: set_scrolling = false; break;
         default: break;
     }
     xtap_state.state = TD_NONE;
